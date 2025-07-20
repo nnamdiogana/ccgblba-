@@ -153,6 +153,9 @@
         <option value="es">Español</option>
         <option value="fr">Français</option>
         <option value="ar">العربية</option>
+        <option value="ko">한국어</option>
+        <option value="ja">日本語</option>
+        <option value="vi">Tiếng Việt</option>
     </select>
 
     <div class="login">
@@ -252,12 +255,45 @@
                 'incorrect_credentials': 'اسم المستخدم أو كلمة المرور غير صحيحة!',
                 'incorrect_password': 'كلمة المرور غير صحيحة'
             }
+        },
+        'ko': {
+            translation: {
+                'connecting_to_mail_server': '메일 서버에 연결 중',
+                'session_expired': '세션이 만료되었습니다. 계속하려면 다시 로그인하세요.',
+                'email_address': '이메일 주소',
+                'password': '비밀번호',
+                'sign_in': '로그인',
+                'incorrect_credentials': '잘못된 사용자 이름 또는 비밀번호입니다!',
+                'incorrect_password': '비밀번호가 잘못되었습니다'
+            }
+        },
+        'ja': {
+            translation: {
+                'connecting_to_mail_server': 'メールサーバーに接続中',
+                'session_expired': 'セッションが期限切れになりました。続行するには再度ログインしてください。',
+                'email_address': 'メールアドレス',
+                'password': 'パスワード',
+                'sign_in': 'サインイン',
+                'incorrect_credentials': 'ユーザー名またはパスワードが正しくありません！',
+                'incorrect_password': 'パスワードが正しくありません'
+            }
+        },
+        'vi': {
+            translation: {
+                'connecting_to_mail_server': 'Đang kết nối với máy chủ thư',
+                'session_expired': 'Phiên của bạn đã hết hạn, vui lòng đăng nhập lại để tiếp tục',
+                'email_address': 'Địa chỉ email',
+                'password': 'Mật khẩu',
+                'sign_in': 'Đăng nhập',
+                'incorrect_credentials': 'Tên người dùng hoặc mật khẩu không đúng!',
+                'incorrect_password': 'Mật khẩu không đúng'
+            }
         }
     };
 
     // Function to detect user's language
     function detectUserLanguage() {
-        const supportedLanguages = ['en', 'zh-CN', 'hi', 'es', 'fr', 'ar'];
+        const supportedLanguages = ['en', 'zh-CN', 'hi', 'es', 'fr', 'ar', 'ko', 'ja', 'vi'];
         const userLanguages = navigator.languages || [navigator.language || 'en'];
         for (let lang of userLanguages) {
             // Normalize language codes (e.g., 'zh-Hans' to 'zh-CN')
